@@ -1,42 +1,68 @@
 import { Link } from "react-router-dom"
 import { Pokemon } from "../../shared/models/pokemon"
-import "./card.css"
-
+import "./card.scss"
+import { colorByType } from "../../util/types-object"
 
 
 export function Card(pokemon: Pokemon) {
     function pokemonSprite(pokemon: Pokemon, name: string) {
         return pokemon.sprites.find(sprite => sprite.name == name)!.img
      }    
+
+    function colorForTypeDiv(type: string) {
+        return {background: colorByType[type.toUpperCase()]}
+    }
+
+    function linearBackgroundValue() {
+        return `linear-gradient(45deg,${colorByType[pokemon.types[0].name.toUpperCase()]},${colorByType[pokemon.types[1].name.toUpperCase()]})`
+    }
+
+    function normalBackgroundValue (type: string) {
+        return colorByType[type.toUpperCase()]
+    }
+
+    function colorOrLinearColorForCard() {
+        if(pokemon.types.length == 2) {
+            return {background: linearBackgroundValue()}
+        }
+        
+        return {background: normalBackgroundValue(pokemon.types[0].name) }
+    }
+
      
     return(
-        <div className="card">
-
-            <div className="front-card">
-                <div className="id-pokemon">{pokemon.id}</div>
-                <div className="card-image">
-                    <img src={pokemonSprite(pokemon, "front_default")} alt="" className="card-img" />
-                </div>
-                <h2>{pokemon.name}</h2>
-                <div className="types-container">
-                   {
-                    pokemon.types.map((type, index) => <div key={index} className={"card" +(index==1? "-second-type": "-type")}>{type.name}</div>)
-                   }
-                </div>
+        <Link className='link-container-1' to={"/shiny-home/"+ pokemon.id}>
+            <div 
+            style={colorOrLinearColorForCard()}
+            className="card"
+            >  
+                <div className="front-card">
+                    <div className="id-pokemon">{pokemon.id}</div>
+                    <div className="card-image">
+                        <span className="img-light"></span>
+                        <img src={pokemonSprite(pokemon, "front_default")} alt="" className="card-img" />
+                    </div>
+                    <h2>{pokemon.name}</h2>
+                    <div className="types-container">
+                    {
+                        pokemon.types.map((type, index) => <div 
+                            style={colorForTypeDiv(type.name)}
+                            key={index} 
+                            className={"card" +(index==1? "-second-type": "-type")}>{type.name.toUpperCase()}
+                        </div>)
+                    }
+                    </div>
+                </div>             
+                <div className="back-card">
+                    <div className="id-pokemon">{pokemon.id}</div>  
+                    <div className="card-image">
+                        <span className="img-light"></span>
+                        <img src={pokemonSprite(pokemon, "back_default")} alt="" />
+                    </div> 
+                    <h2>{pokemon.name}</h2>
+                </div>            
             </div>
-
-
-
-            <div className="back-card">
-                <div className="id-pokemon">{pokemon.id}</div>
-
-                <div className="card-image">
-                    <img src={pokemonSprite(pokemon, "back_default")} alt="" />
-                </div> 
-                
-
-                <h2><Link target={"_blank"} to={"/shiny-home"}>{pokemon.name}</Link></h2>
-            </div>
-        </div>
+        </Link>
+        
     )
 }

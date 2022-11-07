@@ -1,4 +1,4 @@
-import "./pokeball-loader.css"
+import "./pokeball-loader.scss"
 
 export function PokeballLoader() {
 

@@ -1,108 +1,211 @@
 import  React, { useEffect, useState } from 'react'
 import { Card } from '../../components/card/card'
-import { Navigation } from '../../components/navigation/navigation'
 import { PokeballLoader } from '../../components/pokeball-loader/pokeball-loader'
+import { Pokedex } from '../../components/pokedex/pokedex'
 import { Pokemon } from '../../shared/models/pokemon'
 import { Request } from '../../shared/models/request'
+import './home.scss'
 
 export interface PokemonHomeRequest extends Request<Pokemon[]>{
   next: string
   search: string
 }
-
-export interface FilterByType {
+export interface PokemonAppState {
+  pokemonRequest: PokemonHomeRequest
   filterValue: string
-  backgroundStyle: string
 }
 
-
 function App() {
-
- let [request, setRequest] = useState<PokemonHomeRequest>(
+ let [request, setRequest] = useState<PokemonAppState>(
     {
+    pokemonRequest: {
       next: "http://localhost:3000/pokemons",
       value: [],
       isLoading: true,
       search: ""
-    }
+    },
+    filterValue: "NONE"
+  }
   )
+ let [scrolling, setScrolling] = useState(1)
 
-  let [onFilterTypeChange, setOnFilterTypeChange] = useState<FilterByType>({
-    filterValue: "NULL",
-    backgroundStyle: ""
-  })
+ let [headerHeight, setHeaderHeight] = useState({height: '20vh'})
+  
+ function updateHeaderHeight(isDexOpen: boolean) {
+    if(isDexOpen) {
+      setHeaderHeight({ height: '45vh' })
+    } else {
+      setHeaderHeight({ height: '20vh' })
+    }
+  }
 
-  function filterTypeChange(eventFilterValue:string, eventBackgroundStyle: string) {
-    setOnFilterTypeChange(() => {
+  function updateRequestState(searchBarValue: string) {
+    setRequest((prevState) => {
       return {
-        filterValue: eventFilterValue,
-        backgroundStyle: eventBackgroundStyle
+        pokemonRequest: {
+          isLoading: prevState.pokemonRequest.isLoading,
+          next:  prevState.pokemonRequest.next,
+          search: searchBarValue,
+          value: prevState.pokemonRequest.value,
+        },
+        filterValue: prevState.filterValue
       }
     })
-    console.log(onFilterTypeChange.filterValue)
+  }
+  
+  function updateLoading(loading: boolean) {
+    setRequest(prevState => {
+      return {
+        filterValue: prevState.filterValue,
+        pokemonRequest: {
+          isLoading: loading,
+          next: prevState.pokemonRequest.next,
+          search: prevState.pokemonRequest.search,
+          value: prevState.pokemonRequest.value
+        }
+      }
+    })
+  }
+
+  function updateLoadingInResetButton(loading: boolean) {
+    if(!loading) {
+      return setTimeout(() => {
+        updateLoading(loading)
+      }, 1000);
+    }
+    
+    return updateLoading(loading)
+  }
+
+  function updateFilterState(filterByTypeValue: string) {
+    setRequest((prevState) => {
+      return {
+        pokemonRequest: prevState.pokemonRequest,
+        filterValue: filterByTypeValue
+      }
+    })
+  }
+
+  function maximumPokemonHasBeenReached(results: Pokemon[]) {
+    return request.pokemonRequest.search == "" && request.filterValue == "NONE" && results.length == 0 || request.pokemonRequest.search == "" && results.length == 0 || request.filterValue == "NONE" && results.length == 0
+  }
+
+  function updateRequestToFetchFunction(next: string, results: Pokemon[]) {
+    return setRequest((prevState) =>  {
+      return {
+       pokemonRequest: {
+         next: next,
+         value: [...prevState.pokemonRequest.value, ...results],
+         isLoading: false,
+         search: prevState.pokemonRequest.search
+       },
+       filterValue: prevState.filterValue
+      }
+     })
   }
 
   async function fetchPokemon(): Promise<void> {
-    const result = await fetch(request.next)
+    updateLoadingToTrue()
+    const result = await fetch(request.pokemonRequest.next)
     const { next, results } = await result.json()
 
-    setRequest((prevState) =>  {
-      const newState = {
-        next: next,
-        value: [...prevState.value, ...results],
-        isLoading: false,
-        search: request.search,
-      }
-      return newState
-    })
+    if(maximumPokemonHasBeenReached(results)) {
+      alert("the maximum number of pokemons has been reached")
+    }
+
+    updateRequestToFetchFunction(next, results)
   }
 
+  function searchHasPokemonName(pokemon: Pokemon) { 
+    return pokemon.name.toLowerCase().includes(request.pokemonRequest.search.toLowerCase()) 
+  }
+  
+  function searchHasPokemonType(pokemon: Pokemon) {
+    return pokemon.types.map(type => type.name.toLowerCase()).includes(request.filterValue.toLowerCase())
+  }
 
-  // const filteredPokemons = request.value.filter((pokemon) => {
-  //   if(onFilterTypeChange.filter == "NULL") {
-  //     return pokemon
-  //  }
-  //  if(request.value.filter(type => type.name.toLowerCase().includes(onFilterTypeChange.filter.toLowerCase()))) {
-  //     return pokemon
-  //  } else {
-  //   return false
-  //  }
-    
-  //   })
-
- function pokemonLoader() {
-   return request.value.filter(pokemon => {
-      if(request.search == "" && onFilterTypeChange.filterValue == "NULL") {
-        return true
-      } 
-      if (pokemon.name.toLowerCase().includes(request.search.toLowerCase())) {
-        return true
+  function pokemonLoader() {
+    return request.pokemonRequest.value.filter(pokemon => {  
+      if(request.filterValue != 'NONE' && request.pokemonRequest.search != "") {
+        return searchHasPokemonName(pokemon) && searchHasPokemonType(pokemon)    
       }
+        
+      if (request.pokemonRequest.search != "") {
+        return searchHasPokemonName(pokemon)
+      }   
+  
+      if(request.filterValue != 'NONE') {
+        return searchHasPokemonType(pokemon)
+      }
+
+      return true   
     }).map((pokemon: Pokemon) => <Card key={pokemon.id} {...pokemon}/>)
    }
-   
-  useEffect(() => {fetchPokemon()}, [])
- 
-  return (
-    <div className="App">
-      
-    <Navigation 
-    request = {request} 
-    setRequest = {setRequest} 
-    filterTypeChange={filterTypeChange} 
-    onFilterTypeChange={onFilterTypeChange}
-     />
 
-    <main id='card-place'>
-      {
-        request.isLoading? <PokeballLoader /> : pokemonLoader()
+   function updateScrolling(currentScrolling: number) {
+    setTimeout(() => {
+      if(window.scrollY + window.innerHeight + 1 >= document.documentElement.scrollHeight) {
+        setScrolling(currentScrolling + 1)
       }
-    </main>
-    <div id='loader'></div>
+    }, 250);
+   }
 
-    </div>
-
+   function updateLoadingToTrue() {
+    setRequest(prevState => {
+      return {
+        filterValue: prevState.filterValue,
+        pokemonRequest: {
+          isLoading: true,
+          next: prevState.pokemonRequest.next,
+          search: prevState.pokemonRequest.search,
+          value: prevState.pokemonRequest.value
+        }
+      }
+    })
+   }
    
+   function checkIfHasFilter() {
+    return request.pokemonRequest.search != "" || request.filterValue != "NONE" || request.pokemonRequest.search != "" && request.filterValue != "NONE"
+   }
+
+   useEffect(() => {
+
+    if(!checkIfHasFilter()) {
+      fetchPokemon()
+    }
+
+    const scrollHandler = () => {
+      updateScrolling(scrolling)
+    } 
+
+    window.addEventListener('scroll', scrollHandler)
+    
+    return () => window.removeEventListener("scroll", scrollHandler)
+  }, [scrolling])
+   
+   return (
+   
+<div className="App">
+      <header style={headerHeight}>
+        <Pokedex 
+          updateRequestState = {updateRequestState}
+          updateFilterState={updateFilterState}
+          updateLoadingInResetButton={updateLoadingInResetButton}
+          updateHeaderHeight={updateHeaderHeight}
+        />
+      </header>
+     
+  
+      <main id='card-place'>
+        {
+          pokemonLoader()
+        }
+        {
+          request.pokemonRequest.isLoading ? <PokeballLoader /> : undefined
+        }
+      </main>
+
+</div>
   )
 }
 

@@ -3,7 +3,7 @@ export type Color = {
 };
 
 export const colorByType: Color = {
-  NULL: "#FFF",
+  NONE: "linear-gradient(red, pink 60%)",
   FIRE: "orange",
   WATER: "#66d9ff",
   BUG: "#2d912d",

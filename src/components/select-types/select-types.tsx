@@ -1,34 +1,78 @@
-import { FilterByType } from "../../pages/home/home"
+import { useState } from "react"
 import { colorByType } from "../../util/types-object"
-
+import "./select-types.scss"
 interface FilterTypeChange {
-    filterTypeChange: (eventFilterValue: string, eventBackgroundStyle: string) => void
-    onFilterTypeChange: FilterByType
+    updateFilterState: (filterByTypeValue: string) => void
+    updateLoadingInResetButton: (filterByTypeValue: boolean) => void
 }
 
-export function SelectTypes({filterTypeChange, onFilterTypeChange}: FilterTypeChange ) { 
+interface SelectFilter {
+    filterProperty: string
+    filterColor: string
+}
+
+export function SelectTypes({updateFilterState, updateLoadingInResetButton}: FilterTypeChange ) { 
+    let [filterState, setFilterState] = useState<SelectFilter>({
+        filterProperty: "",
+        filterColor: ""
+    })
+
     function options() {
         return Object.entries(colorByType).map(([key, value]) => {
              return(
-                 <option key={key} value={value}  style={{
-                     backgroundColor: value
-                 }}>{key}</option>
+                 <option 
+                 className="option"
+                 key={key} 
+                 value={key}  
+                 style={
+                    key == 'NONE' ? { backgroundColor: 'white' } : { backgroundColor: value }
+                 }
+                 >{key}</option>
              )
          })
     } 
 
      return (
-        <select name="Types" id="type" className='types' required 
-        onChange={event => {
-            const index = event.target.selectedIndex
-            filterTypeChange(event.target[index].textContent!, event.target.value)
-        }}
-        style={
-            {
-                backgroundColor: onFilterTypeChange.backgroundStyle
-            }
-        }> 
-            {options()}
-        </select>
+        <div id="filter-select">
+            <select 
+            id="type"
+            className='types' 
+            required 
+            value={filterState.filterProperty}
+            style={{ background: filterState.filterColor }}
+            onChange={event => {
+                if(event.target.value == 'NONE') {
+                    updateLoadingInResetButton(true)
+                }
+                setFilterState({
+                    filterProperty: event.target.value,
+                    filterColor: colorByType[event.target.value]
+
+                })
+                updateFilterState(event.target.value)
+                if(event.target.value == 'NONE') {
+                    updateLoadingInResetButton(false)
+                }
+            }}
+            >{options()}</select>
+
+            <button 
+            className='stylebutton' 
+            id="reset-button" 
+            onClick={() => {
+                    updateLoadingInResetButton(true)
+                    setFilterState({
+                        filterProperty: "NONE",
+                        filterColor: colorByType["NONE"]      
+                    })
+                    updateFilterState("NONE")
+                    updateLoadingInResetButton(false)
+                }
+            } 
+            >Reset</button>
+
+        </div>
+        
+        
      )
  }
