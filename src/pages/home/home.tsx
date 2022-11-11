@@ -19,7 +19,7 @@ function App() {
  let [request, setRequest] = useState<PokemonAppState>(
     {
     pokemonRequest: {
-      next: "http://localhost:3000/pokemons",
+      next: "http://localhost:3000/pokemon",
       value: [],
       isLoading: true,
       search: ""
