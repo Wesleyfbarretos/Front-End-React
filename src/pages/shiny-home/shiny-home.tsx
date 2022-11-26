@@ -1,176 +1,146 @@
-import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
-import { PokeballLoader } from "../../components/pokeball-loader/pokeball-loader"
-import { ShinyCard } from "../../components/shiny-card/shiny-card"
-import { Pokemon } from "../../shared/models/pokemon"
-import "./shiny-home.scss"
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { PokeballLoader } from "../../components/pokeball-loader/pokeball-loader";
+import { ShinyCard } from "../../components/shiny-card/shiny-card";
+import { Pokemon } from "../../shared/models/pokemon";
+import "./shiny-home.scss";
 
 export interface ShinyHomeRequest {
-  pokemon: Pokemon,
-  isLoading: boolean
+  pokemon: Pokemon;
+  isLoading: boolean;
 }
 
 export function ShinyHome() {
-    const {id} = useParams()
-    const url = `http://localhost:3000/pokemon/${id}`
+  const { id } = useParams();
+  const url = `http://localhost:3000/pokemon/${id}`;
 
-    let [request, setRequest] = useState<ShinyHomeRequest>({
-      pokemon: {
-        id: 0,
-        name: "",
-        sprites: [],
-        types: []
-      },
-      isLoading: true
-    })
+  let [request, setRequest] = useState<ShinyHomeRequest>({
+    pokemon: {
+      id: 0,
+      name: "",
+      sprites: [],
+      types: []
+    },
+    isLoading: true
+  });
 
-    let [previousBorder, setPreviousBorder] = useState(
-    {
-      borderBottomColor: 'gold', 
-      borderLeftColor: 'transparent',
-      borderRightColor: 'transparent'
-    }
-  )
-    let [nextBorder, setNextBorder] = useState(
-      {
-        borderBottomColor: 'gold', 
-        borderLeftColor: 'transparent',
-        borderRightColor: 'transparent'
-      }
-    )
+  let [previousBorder, setPreviousBorder] = useState({
+    borderBottomColor: "gold",
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent"
+  });
+  let [nextBorder, setNextBorder] = useState({
+    borderBottomColor: "gold",
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent"
+  });
 
   function updateLoadingToTrue() {
     setRequest(prevState => {
-        return {
-          pokemon: prevState.pokemon,
-          isLoading: true
-        }
-    })
+      return {
+        pokemon: prevState.pokemon,
+        isLoading: true
+      };
+    });
   }
 
   function updateLoadingToFalse() {
     setRequest(prevState => {
-        return {
-          pokemon: prevState.pokemon,
-          isLoading: false
-        }
-    })
+      return {
+        pokemon: prevState.pokemon,
+        isLoading: false
+      };
+    });
   }
-  
-    
-   async function fetchPokemonShiny(): Promise<void> {
-    updateLoadingToTrue()
-    const data = await fetch(url)
-    const result = await data.json()
 
-    if(!result) {
-      throw new Error('Pokemon does not exist')
+  async function fetchPokemonShiny(): Promise<void> {
+    updateLoadingToTrue();
+    const data = await fetch(url);
+    const result = await data.json();
+
+    if (!result) {
+      throw new Error("Pokemon does not exist");
     }
 
     setRequest({
       pokemon: result,
       isLoading: false
-    })
-    updateLoadingToFalse()
+    });
+    updateLoadingToFalse();
   }
 
   function fetchPreviousPokemon() {
-     if(Number(id) - 1 == 0) {
-      return 1
-     }   
-     return Number(id) - 1
+    if (Number(id) - 1 == 0) {
+      return 1;
+    }
+    return Number(id) - 1;
   }
 
   function fetchNextPokemon() {
-    if(Number(id) + 1 == 1155) {
-      return 1154
-     } 
-    return Number(id) + 1
+    if (Number(id) + 1 == 1155) {
+      return 1154;
+    }
+    return Number(id) + 1;
   }
 
-  function noMorePokemonsPreviousBorder() { 
-    if(Number(id) -1 == 0) {
+  function noMorePokemonsPreviousBorder() {
+    if (Number(id) - 1 == 0) {
       setPreviousBorder(prevState => {
         return {
-          borderBottomColor: 'red',
+          borderBottomColor: "red",
           borderLeftColor: prevState.borderLeftColor,
           borderRightColor: prevState.borderRightColor
-        }
-      })
-    } 
-
-    else {
+        };
+      });
+    } else {
       setPreviousBorder(prevState => {
         return {
-          borderBottomColor: 'gold',
+          borderBottomColor: "gold",
           borderLeftColor: prevState.borderLeftColor,
           borderRightColor: prevState.borderRightColor
-        }
-      })
+        };
+      });
     }
   }
 
   function noMorePokemonsNextBorder() {
-    if(Number(id) + 1 == 1155) {
+    if (Number(id) + 1 == 1155) {
       setNextBorder(prevState => {
         return {
-          borderBottomColor: 'red',
+          borderBottomColor: "red",
           borderLeftColor: prevState.borderLeftColor,
           borderRightColor: prevState.borderRightColor
-        }
-      })
-     } 
-     
-     else {
+        };
+      });
+    } else {
       setNextBorder(prevState => {
         return {
-          borderBottomColor: 'gold',
+          borderBottomColor: "gold",
           borderLeftColor: prevState.borderLeftColor,
           borderRightColor: prevState.borderRightColor
-        }
-      })
-     }
+        };
+      });
+    }
   }
 
-  
+  useEffect(() => {
+    fetchPokemonShiny();
+    noMorePokemonsPreviousBorder();
+    noMorePokemonsNextBorder();
+  }, [id]);
 
-    useEffect(() => {
-      fetchPokemonShiny()
-      noMorePokemonsPreviousBorder()
-      noMorePokemonsNextBorder()
-    }, [id])
+  return (
+    <div id="card-place-link">
+      {request.isLoading ? <PokeballLoader /> : <ShinyCard {...request.pokemon} />}
+      <div className="previous-next-container">
+        <Link to={`/shiny-home/${fetchPreviousPokemon()}`} className="link-container">
+          <div className="previous" style={previousBorder} />
+        </Link>
 
-
-    return (
-
-       <div id="card-place-link">
-            {
-             request.isLoading? <PokeballLoader /> : <ShinyCard {...request.pokemon}/>
-            }
-            <div className="previous-next-container">
-                <Link 
-                to={`/shiny-home/${fetchPreviousPokemon()}`}
-                className='link-container'
-                >
-                    <div 
-                    className="previous"
-                    style={previousBorder}
-                    >
-                    </div>
-                </Link>
-                
-                <Link
-                to={`/shiny-home/${fetchNextPokemon()}`}
-                className='link-container'
-                >
-                    <div 
-                    className="next"
-                    style={nextBorder}
-                    >
-                    </div>
-                </Link>
-
-            </div>
-       </div>
-    )
+        <Link to={`/shiny-home/${fetchNextPokemon()}`} className="link-container">
+          <div className="next" style={nextBorder} />
+        </Link>
+      </div>
+    </div>
+  );
 }

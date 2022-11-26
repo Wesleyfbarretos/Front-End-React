@@ -1,9 +1,6 @@
-
-import {
-  createBrowserRouter
-} from "react-router-dom";
-import App from '../pages/home/home'
-import { ShinyHome } from "../pages/shiny-home/shiny-home"; 
+import { createBrowserRouter } from "react-router-dom";
+import App from "../pages/home/home";
+import { ShinyHome } from "../pages/shiny-home/shiny-home";
 
 export const router = createBrowserRouter([
   {
@@ -15,4 +12,3 @@ export const router = createBrowserRouter([
     element: <ShinyHome />
   }
 ]);
-

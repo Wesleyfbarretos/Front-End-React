@@ -21,5 +21,5 @@ export const colorByType: Color = {
   STEEL: "#e2e3e0",
   DARK: "#b509ff",
   GRASS: "lightgreen",
-  FLYING: "lightblue",
+  FLYING: "lightblue"
 };
