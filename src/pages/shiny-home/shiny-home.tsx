@@ -84,7 +84,7 @@ export function ShinyHome() {
   }
 
   function noMorePokemonsPreviousBorder() {
-    if (Number(id) - 1 == 0) {
+    if (Number(id) - 1 <= 0) {
       setPreviousBorder(prevState => {
         return {
           borderBottomColor: "red",
@@ -104,7 +104,7 @@ export function ShinyHome() {
   }
 
   function noMorePokemonsNextBorder() {
-    if (Number(id) + 1 == 1155) {
+    if (Number(id) + 1 >= 1155) {
       setNextBorder(prevState => {
         return {
           borderBottomColor: "red",
@@ -133,12 +133,12 @@ export function ShinyHome() {
     <div id="card-place-link">
       {request.isLoading ? <PokeballLoader /> : <ShinyCard {...request.pokemon} />}
       <div className="previous-next-container">
-        <Link to={`/shiny-home/${fetchPreviousPokemon()}`} className="link-container">
-          <div className="previous" style={previousBorder} />
+        <Link data-testid="previous-pokemon" to={`/shiny-home/${fetchPreviousPokemon()}`} className="link-container">
+          <div data-testid="previous-pokemon-content" className="previous" style={previousBorder} />
         </Link>
 
-        <Link to={`/shiny-home/${fetchNextPokemon()}`} className="link-container">
-          <div className="next" style={nextBorder} />
+        <Link data-testid="next-pokemon" to={`/shiny-home/${fetchNextPokemon()}`} className="link-container">
+          <div data-testid="next-pokemon-content" className="next" style={nextBorder} />
         </Link>
       </div>
     </div>

@@ -178,7 +178,7 @@ function App() {
 
   return (
     <div className="App">
-      <header style={headerHeight}>
+      <header data-testid="header" style={headerHeight}>
         <Pokedex
           updateRequestState={updateRequestState}
           updateFilterState={updateFilterState}
