@@ -70,14 +70,14 @@ export function ShinyHome() {
   }
 
   function fetchPreviousPokemon() {
-    if (Number(id) - 1 == 0) {
+    if (Number(id) - 1 <= 0) {
       return 1;
     }
     return Number(id) - 1;
   }
 
   function fetchNextPokemon() {
-    if (Number(id) + 1 == 1155) {
+    if (Number(id) + 1 >= 1155) {
       return 1154;
     }
     return Number(id) + 1;
@@ -133,11 +133,11 @@ export function ShinyHome() {
     <div id="card-place-link">
       {request.isLoading ? <PokeballLoader /> : <ShinyCard {...request.pokemon} />}
       <div className="previous-next-container">
-        <Link data-testid="previous-pokemon" to={`/shiny-home/${fetchPreviousPokemon()}`} className="link-container">
+        <Link data-testid="previous-pokemon" id="previous-link" to={`/shiny-home/${fetchPreviousPokemon()}`} className="link-container">
           <div data-testid="previous-pokemon-content" className="previous" style={previousBorder} />
         </Link>
 
-        <Link data-testid="next-pokemon" to={`/shiny-home/${fetchNextPokemon()}`} className="link-container">
+        <Link data-testid="next-pokemon" id="next-link" to={`/shiny-home/${fetchNextPokemon()}`} className="link-container">
           <div data-testid="next-pokemon-content" className="next" style={nextBorder} />
         </Link>
       </div>

@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
+    "tests": "cypress open",
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
@@ -29,11 +30,13 @@
     "@vitejs/plugin-react": "^2.1.0",
     "@vitest/coverage-c8": "^0.24.5",
     "@vitest/ui": "latest",
+    "cypress": "^11.2.0",
     "eslint": "8.2.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.5.2",
+    "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-import": "2.25.3",
     "eslint-plugin-jsx-a11y": "6.5.1",
     "eslint-plugin-prettier": "^4.2.1",

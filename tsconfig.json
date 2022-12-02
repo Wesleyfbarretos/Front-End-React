@@ -15,8 +15,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "sourceMap": true
+    "sourceMap": true,
+		"types": ["cypress"]
   },
-  "include": ["./src", "vite.config.ts", ".eslintrc.json"],
+  "include": ["./src", "vite.config.ts", ".eslintrc.json", "cypress.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

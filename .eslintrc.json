@@ -2,7 +2,8 @@
   "env": {
     "es2021": true,
     "browser": true,
-    "node": true
+    "node": true,
+		"cypress/globals": true
   },
   "extends": [
     "airbnb",
@@ -12,7 +13,8 @@
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
-    "plugin:react-hooks/recommended"
+    "plugin:react-hooks/recommended",
+		"plugin:cypress/recommended"
   ],
   "overrides": [],
   "parser": "@typescript-eslint/parser",
@@ -21,7 +23,7 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": ["react", "@typescript-eslint", "prettier"],
+  "plugins": ["react", "@typescript-eslint", "prettier", "cypress"],
   "rules": {
     "indent": ["error", 2],
     "linebreak-style": ["error", "unix"],
@@ -44,7 +46,13 @@
     "@typescript-eslint/naming-convention": 0,
     "jsx-a11y/click-events-have-key-events": 0,
     "jsx-a11y/no-static-element-interactions": 0,
-    "react/button-has-type": 0
+    "react/button-has-type": 0,
+		"cypress/no-assigning-return-values": "error",
+    "cypress/no-unnecessary-waiting": "error",
+    "cypress/assertion-before-screenshot": "warn",
+    "cypress/no-force": "warn",
+    "cypress/no-async-tests": "error",
+    "cypress/no-pause": "error"
   },
   "settings": {
     "import/resolver": {
