@@ -18,6 +18,6 @@
     "sourceMap": true,
 		"types": ["cypress"]
   },
-  "include": ["./src", "vite.config.ts", ".eslintrc.json", "cypress.config.ts"],
+  "include": ["./src", "vite.config.ts", ".eslintrc.json", "cypress.config.ts", "../../node_modules/cypress", "./cypress"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
